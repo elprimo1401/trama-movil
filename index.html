@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Trama</title>
+<style>
+:root{--bg:#0b0c10;--panel:#15171e;--soft:#1f2330;--ink:#eef0f6;--muted:#8f95a8;--line:#262a36;--red:#ff3d57;--cyan:#3ee6ff;--ok:#3ddc97;--warn:#ffc65c;--pc:#ff3d57;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(700px 400px at 90% -10%,rgba(255,61,87,.14),transparent 60%),var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+main{max-width:560px;margin:0 auto;padding:16px 16px calc(28px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:10px;padding:6px 0 14px}
+.logo{font-weight:800;letter-spacing:.18em;font-size:13px;display:flex;align-items:center;gap:8px}
+.logo i{width:22px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--red),#ff7a59);box-shadow:0 0 10px var(--red)}
+header .yo{margin-left:auto;font-size:13px;color:var(--muted);text-align:right}
+.card{background:rgba(21,23,30,.92);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:700}
+.big{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.mut{color:var(--muted);font-size:13px}
+.barra{height:6px;border-radius:6px;background:var(--soft);overflow:hidden;margin:10px 0 6px}
+.barra i{display:block;height:100%;background:linear-gradient(90deg,var(--pc),var(--cyan));border-radius:6px;transition:width .6s}
+pre{margin:8px 0 0;font:12px/1.45 ui-monospace,Consolas,monospace;color:#b9bfd0;white-space:pre-wrap;word-break:break-word;max-height:140px;overflow:auto;background:#0f1116;border-radius:10px;padding:8px 10px}
+.fila{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)} .fila:first-of-type{border-top:0}
+.h{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)} .h:first-of-type{border-top:0}
+.h img,.h .sin{width:54px;height:96px;object-fit:cover;border-radius:10px;flex:none;background:var(--soft)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--muted)} .chip.ok{background:rgba(61,220,151,.14);color:var(--ok)} .chip.w{background:rgba(255,198,92,.13);color:var(--warn)}
+.tot{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.tot div{background:var(--soft);border-radius:14px;padding:10px 12px} .tot b{display:block;font-size:20px}
+input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:#0f1116;color:var(--ink);font:inherit;font-size:16px}
+button{font:inherit;border:0;border-radius:12px;padding:12px 16px;font-weight:650;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--red),#ff7a59)}
+button.g{background:var(--soft);color:var(--ink)} button:disabled{opacity:.55}
+label.t{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:14px;color:var(--muted)} label.t input{width:auto}
+.centro{min-height:70vh;display:grid;place-items:center;text-align:center}
+.err{color:#ff8a9b;font-size:14px;margin-top:10px;min-height:1em}
+.pf{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:999px;background:var(--soft);font-size:13px;margin:0 6px 6px 0}
+.pf span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--c,#555)} .pf.on{outline:2px solid var(--c)}
+.pie{text-align:center;margin-top:18px}
+.vivo{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(61,220,151,.18);margin-right:6px;animation:l 1.6s infinite} @keyframes l{50%{opacity:.4}}
+</style>
+</head>
+<body>
+<main id="app"><div class="centro"><div class="mut">Cargando…</div></div></main>
+<script>
+/* Cifrado de Trama en el navegador: SHAKE-256 (keccak) + HMAC-SHA256 + PBKDF2 (WebCrypto). Igual que cripto.py. */
+const TC = (() => {
+  const RC = [1,0, 0x8082,0, 0x808a,0x80000000, 0x80008000,0x80000000, 0x808b,0, 0x80000001,0, 0x80008081,0x80000000, 0x8009,0x80000000,
+    0x8a,0, 0x88,0, 0x80008009,0, 0x8000000a,0, 0x8000808b,0, 0x8b,0x80000000, 0x8089,0x80000000, 0x8003,0x80000000,
+    0x8002,0x80000000, 0x80,0x80000000, 0x800a,0, 0x8000000a,0x80000000, 0x80008081,0x80000000, 0x8080,0x80000000, 0x80000001,0, 0x80008008,0x80000000];
+  const ROT = [0,1,62,28,27,36,44,6,55,20,3,10,43,25,39,41,45,15,21,8,18,2,61,56,14];
+  const PI = new Array(25);                      // destino de cada carril en ρ+π: B[y, 2x+3y] = rot(A[x,y])
+  for(let x=0;x<5;x++) for(let y=0;y<5;y++) PI[x+5*y] = y + 5*((2*x+3*y)%5);
+  function f(s){
+    const C = new Uint32Array(10), B = new Uint32Array(50);
+    for(let r=0;r<24;r++){
+      for(let x=0;x<5;x++){ C[2*x]=s[2*x]^s[2*x+10]^s[2*x+20]^s[2*x+30]^s[2*x+40]; C[2*x+1]=s[2*x+1]^s[2*x+11]^s[2*x+21]^s[2*x+31]^s[2*x+41]; }
+      for(let x=0;x<5;x++){
+        const a=(x+4)%5, b=(x+1)%5, lo=C[2*b], hi=C[2*b+1];
+        const dl = C[2*a] ^ ((lo<<1)|(hi>>>31)), dh = C[2*a+1] ^ ((hi<<1)|(lo>>>31));
+        for(let y=0;y<25;y+=5){ s[2*(x+y)]^=dl; s[2*(x+y)+1]^=dh; }
+      }
+      for(let i=0;i<25;i++){
+        let lo=s[2*i], hi=s[2*i+1], n=ROT[i];
+        if(n>=32){ const t=lo; lo=hi; hi=t; n-=32; }
+        if(n){ const l2=(lo<<n)|(hi>>>(32-n)), h2=(hi<<n)|(lo>>>(32-n)); lo=l2; hi=h2; }
+        B[2*PI[i]]=lo; B[2*PI[i]+1]=hi;
+      }
+      for(let y=0;y<25;y+=5) for(let x=0;x<5;x++){
+        const i=x+y, j=(x+1)%5+y, k=(x+2)%5+y;
+        s[2*i]=B[2*i]^(~B[2*j]&B[2*k]); s[2*i+1]=B[2*i+1]^(~B[2*j+1]&B[2*k+1]);
+      }
+      s[0]^=RC[2*r]; s[1]^=RC[2*r+1];
+    }
+  }
+  function shake256(entrada, largo){
+    const RATE=136, s=new Uint32Array(50), m=new Uint8Array(Math.floor(entrada.length/RATE+1)*RATE);
+    m.set(entrada); m[entrada.length]^=0x1f; m[m.length-1]^=0x80;
+    for(let o=0;o<m.length;o+=RATE){
+      for(let j=0;j<RATE;j++) s[j>>2] ^= m[o+j] << (8*(j&3));
+      f(s);
+    }
+    const out=new Uint8Array(largo); let p=0;
+    while(true){
+      for(let j=0;j<RATE && p<largo;j++,p++) out[p]=(s[j>>2]>>>(8*(j&3)))&255;
+      if(p>=largo) return out; f(s);
+    }
+  }
+  const sub = crypto.subtle, te = new TextEncoder();
+  async function hmac(llave, datos){ const k = await sub.importKey("raw", llave, {name:"HMAC", hash:"SHA-256"}, false, ["sign"]); return new Uint8Array(await sub.sign("HMAC", k, datos)); }
+  const junta = (...xs) => { const o=new Uint8Array(xs.reduce((n,x)=>n+x.length,0)); let p=0; for(const x of xs){ o.set(x,p); p+=x.length; } return o; };
+  const igual = (a,b) => { if(a.length!==b.length) return false; let d=0; for(let i=0;i<a.length;i++) d|=a[i]^b[i]; return d===0; };
+  async function descifrar(llave, blob){
+    if(blob[0]!==84||blob[1]!==82||blob[2]!==49) throw new Error("formato desconocido");
+    const nonce=blob.slice(3,27), tag=blob.slice(27,59), ct=blob.slice(59);
+    const mac = await hmac(await hmac(llave, te.encode("mac")), junta(nonce, ct));
+    if(!igual(mac, tag)) throw new Error("llave incorrecta");
+    const flujo = shake256(junta(await hmac(llave, te.encode("enc")), nonce), ct.length);
+    for(let i=0;i<ct.length;i++) ct[i]^=flujo[i];
+    return ct;
+  }
+  async function derivar(secreto, sal, vueltas){
+    const k = await sub.importKey("raw", te.encode(secreto), "PBKDF2", false, ["deriveBits"]);
+    return new Uint8Array(await sub.deriveBits({name:"PBKDF2", hash:"SHA-256", salt:sal, iterations:vueltas}, k, 256));
+  }
+  const de64 = s => { s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; const b=atob(s), o=new Uint8Array(b.length); for(let i=0;i<b.length;i++) o[i]=b.charCodeAt(i); return o; };
+  const a64 = u => { let s=""; for(let i=0;i<u.length;i+=0x8000) s+=String.fromCharCode.apply(null, u.subarray(i,i+0x8000)); return btoa(s); };
+  return {shake256, descifrar, derivar, de64, a64, texto: u => new TextDecoder().decode(u)};
+})();
+if(typeof module !== "undefined") module.exports = TC;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const RED = {tiktok:"🎵 TikTok", instagram:"📸 Instagram", youtube:"▶️ YouTube", facebook:"📘 Facebook"};
+const LS = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }, del(k){ try{ localStorage.removeItem(k); }catch(e){} } };
+const SS = { get(k){ try{ return sessionStorage.getItem(k); }catch(e){ return null; } }, set(k,v){ try{ sessionStorage.setItem(k,v); }catch(e){} } };
+let PAQ = null, SES = null, temporizador = null;
+
+function hace(t){ if(!t) return "—"; const s = Math.max(0, Date.now()/1000 - t);
+  return s < 60 ? "hace un momento" : s < 3600 ? `hace ${Math.round(s/60)} min` : s < 86400 ? `hace ${Math.round(s/3600)} h` : `hace ${Math.round(s/86400)} días`; }
+function dur(s){ s = Math.round(s||0); return s < 60 ? `${s} s` : s < 3600 ? `${Math.round(s/60)} min` : `${Math.floor(s/3600)} h ${Math.round(s%3600/60)} min`; }
+
+async function gh(ruta, token){
+  const r = await fetch("https://api.github.com" + ruta, {headers:{Authorization:"Bearer " + token, Accept:"application/vnd.github.raw+json"}, cache:"no-store"});
+  if(r.status === 401) throw new Error("GitHub ya no acepta el permiso de Trama: vuelve a vincular el celular con el QR.");
+  if(r.status === 404) return null;
+  if(!r.ok) throw new Error("GitHub respondió " + r.status);
+  return await r.text();
+}
+
+function inicio(){
+  const m = location.hash.match(/k=([A-Za-z0-9_-]+)/);
+  if(m){ LS.set("trama_paquete", m[1]); LS.del("trama_sesion"); history.replaceState(null, "", location.pathname); }
+  const p = LS.get("trama_paquete");
+  if(!p) return pantallaVincular();
+  try{ PAQ = JSON.parse(TC.texto(TC.de64(p))); }catch(e){ LS.del("trama_paquete"); return pantallaVincular(); }
+  const s = LS.get("trama_sesion") || SS.get("trama_sesion");
+  if(s){ try{ SES = JSON.parse(s); return cargar(); }catch(e){} }
+  pantallaFrase();
+}
+
+function pantallaVincular(){
+  $("#app").innerHTML = `<div class="centro"><div><div class="logo" style="justify-content:center;margin-bottom:22px"><i></i>TRAMA<i></i></div>
+    <div class="big">Vincula este celular</div>
+    <p class="mut" style="max-width:320px;margin:10px auto 0">En la app de Trama de tu compu abre tu perfil (arriba a la izquierda) → <b>📱 Ver en el celular</b> y escanea el código QR con la cámara.</p></div></div>`;
+}
+
+function pantallaFrase(error){
+  $("#app").innerHTML = `<div class="centro"><form id="f" style="width:100%;max-width:360px;text-align:left">
+    <div class="logo" style="justify-content:center;margin-bottom:22px"><i></i>TRAMA<i></i></div>
+    <div class="big" style="text-align:center">Escribe tu frase de privacidad</div>
+    <p class="mut" style="text-align:center;margin:6px 0 18px">Tus datos viajan cifrados: solo esta frase los abre, aquí en tu celular. <b>@${esc(PAQ.o)}</b></p>
+    <input id="frase" type="password" autocomplete="current-password" placeholder="Tu frase" required>
+    <label class="t"><input type="checkbox" id="rec" checked> Recordar en este celular</label>
+    <button id="btn" style="width:100%">Abrir</button><div class="err" id="err">${esc(error||"")}</div>
+    <p class="mut" style="text-align:center;margin-top:18px"><a href="#" onclick="olvidar();return false" style="color:var(--muted)">Desvincular este celular</a></p></form></div>`;
+  $("#frase").focus();
+  $("#f").onsubmit = async ev => { ev.preventDefault(); const b = $("#btn"); b.disabled = true; b.textContent = "Abriendo…"; $("#err").textContent = "";
+    try{
+      const frase = $("#frase").value;
+      let token;
+      try{ token = TC.texto(await TC.descifrar(await TC.derivar(frase, TC.de64(PAQ.s), 310000), TC.de64(PAQ.t))); }
+      catch(e){ throw new Error("Esa frase no es la de tu Trama."); }
+      const bov = await gh(`/repos/${PAQ.o}/${PAQ.r}/contents/boveda.json`, token);
+      if(!bov) throw new Error("No encontré tu bóveda en GitHub.");
+      const f = JSON.parse(bov);
+      let llave;
+      try{ llave = await TC.descifrar(await TC.derivar(frase, TC.de64(f.sal_pw), 310000), TC.de64(f.llave_pw)); }
+      catch(e){ throw new Error("Tu frase cambió en la compu: vuelve a escanear el QR."); }
+      const nombre = f.nombre ? TC.texto(await TC.descifrar(llave, TC.de64(f.nombre))) : PAQ.o;
+      SES = {token, llave: TC.a64(llave), nombre};
+      ($("#rec").checked ? LS : SS).set("trama_sesion", JSON.stringify(SES));
+      cargar();
+    }catch(e){ b.disabled = false; b.textContent = "Abrir"; $("#err").textContent = e.message; }
+  };
+}
+
+function olvidar(){ LS.del("trama_paquete"); LS.del("trama_sesion"); try{ sessionStorage.clear(); }catch(e){} pantallaVincular(); }
+
+async function cargar(){
+  clearTimeout(temporizador);
+  try{
+    const t = await gh(`/repos/${PAQ.o}/${PAQ.r}/contents/movil.bin?ref=estado`, SES.token);
+    if(!t){ pintarVacio(); }
+    else pintar(JSON.parse(TC.texto(await TC.descifrar(TC.de64(SES.llave), TC.de64(t.trim())))));
+  }catch(e){
+    if(/llave incorrecta/.test(e.message)){ LS.del("trama_sesion"); return pantallaFrase("Tu llave cambió: escribe tu frase otra vez."); }
+    if(!$("#estadoRed")) $("#app").innerHTML = `<div class="centro"><div><div class="big">Sin conexión</div><p class="mut">${esc(e.message)}</p><button onclick="cargar()">Reintentar</button></div></div>`;
+    else $("#estadoRed").textContent = "⚠️ " + e.message;
+  }
+  temporizador = setTimeout(() => { if(!document.hidden) cargar(); }, 60000);
+}
+document.addEventListener("visibilitychange", () => { if(!document.hidden && SES) cargar(); });
+
+function cabeza(){ return `<header><div class="logo"><i></i>TRAMA</div><div class="yo">${esc(SES.nombre)}<br><span style="font-size:11.5px">@${esc(PAQ.o)}</span></div></header>`; }
+
+function pintarVacio(){
+  $("#app").innerHTML = cabeza() + `<div class="card"><div class="big">Todavía no hay datos</div><p class="mut">Deja abierta la app de Trama en tu compu un par de minutos: sube aquí cómo va todo (cifrado).</p><button class="g" onclick="cargar()">Actualizar</button></div>`;
+}
+
+function pintar(d){
+  const edad = Date.now()/1000 - (d.generado||0), a = d.tarea;
+  const viva = edad < 600;
+  document.documentElement.style.setProperty("--pc", (d.perfiles.find(p=>p.activo)||{}).color || "#ff3d57");
+  let h = cabeza();
+  h += `<div class="mut" style="margin:-6px 0 12px" id="estadoRed">${viva ? '<span class="vivo"></span>' : "💤 "}Actualizado ${hace(d.generado)}${viva ? "" : " · la compu podría estar apagada o sin la app abierta"}</div>`;
+  h += `<div>${d.perfiles.map(p=>`<span class="pf ${p.activo?"on":""}" style="--c:${esc(p.color)}"><span>${esc(p.emoji)}</span>${esc(p.nombre)}</span>`).join("")}</div>`;
+  // ahora
+  h += `<div class="card"><h2>Ahora</h2>`;
+  if(a){ const pr = a.progreso != null ? Math.round(a.progreso*100) : null;
+    h += `<div class="big">${esc(a.nombre)}</div><div class="barra"><i style="width:${pr ?? 8}%"></i></div>
+      <div class="mut">${pr != null ? pr + "%" : "trabajando"}${a.eta ? " · faltan ~" + dur(a.eta) : ""}${a.inicio ? " · empezó " + hace(a.inicio) : ""}</div>
+      ${a.lineas && a.lineas.length ? `<pre>${esc(a.lineas.join("\n"))}</pre>` : ""}`;
+  } else h += `<div class="big">${viva ? "Sin tareas: la compu está libre" : "Nada corriendo"}</div>`;
+  if(d.cola && d.cola.length) h += `<div class="mut" style="margin-top:10px">En cola: ${d.cola.map(esc).join(" · ")}</div>`;
+  h += `<div class="mut" style="margin-top:8px">ComfyUI: ${d.comfy ? "🟢 abierto" : "⚪ cerrado"}</div></div>`;
+  // terminadas
+  if(d.hechas && d.hechas.length){
+    h += `<div class="card"><h2>Lo último que terminó</h2>` + d.hechas.map(x=>`<div class="fila"><span>${x.codigo===0?"✅":x.estado==="cancelada"?"⏹️":"❌"}</span><div style="flex:1;min-width:0">${esc(x.nombre)}</div><span class="mut">${hace(x.fin)}</span></div>`).join("") + `</div>`;
+  }
+  // totales
+  const t = d.totales || {};
+  h += `<div class="card"><h2>${esc((d.perfiles.find(p=>p.activo)||{}).nombre || "Canal")}</h2><div class="tot">
+    <div><b>${t.historias||0}</b><span class="mut">historias</span></div><div><b>${t.listas||0}/${t.partes||0}</b><span class="mut">videos listos</span></div>
+    <div><b>${t.publicadas||0}</b><span class="mut">publicados</span></div><div><b>${(t.vistas||0).toLocaleString("es")}</b><span class="mut">vistas</span></div></div></div>`;
+  // historias
+  if(d.historias && d.historias.length){
+    h += `<div class="card"><h2>Historias</h2>` + d.historias.map(x=>`<div class="h">${x.mini ? `<img alt="" src="data:image/jpeg;base64,${x.mini}">` : `<div class="sin"></div>`}
+      <div style="min-width:0;flex:1"><b>${esc(x.titulo)}</b><div class="mut">${x.listas}/${x.total||x.partes.length} partes listas · ${x.publicadas} publicadas</div>
+      <div class="chips">${x.partes.map(p=>`<span class="chip ${p.publicado?"ok":p.video?"w":""}" title="${esc(p.paso_texto)}">P${p.n} ${p.publicado?"📤":p.video?"🎬":`🖼️ ${p.imagenes}/${p.escenas}`}</span>`).join("")}</div></div></div>`).join("") + `</div>`;
+  }
+  // métricas
+  const m = d.metricas || {};
+  if(m.totales && Object.keys(m.totales).length){
+    h += `<div class="card"><h2>Métricas por red</h2>` + Object.entries(m.totales).map(([r,v])=>`<div class="fila"><span style="flex:1">${RED[r]||esc(r)}</span>
+      <span class="mut">${v.vistas.toLocaleString("es")} vistas · ${v.likes.toLocaleString("es")} ❤ · ${v.videos} videos</span></div>`).join("")
+      + (m.actualizado ? `<div class="mut" style="margin-top:8px">Números de las redes al ${esc(m.actualizado)}</div>` : "") + `</div>`;
+  }
+  h += `<div class="pie"><button class="g" onclick="cargar()">↻ Actualizar</button></div>
+    <p class="mut" style="text-align:center;margin-top:18px">Trama ${esc(d.version||"")} · cifrado de extremo a extremo<br><a href="#" onclick="olvidar();return false" style="color:var(--muted)">Desvincular este celular</a></p>`;
+  $("#app").innerHTML = h;
+}
+inicio();
+</script>
+</body>
+</html>
